@@ -1,12 +1,14 @@
 from agno.agent import Agent
+from agno.models.azure import AzureOpenAI
 from agno.models.openai import OpenAIChat
 from agno.knowledge.text import TextKnowledgeBase
 from agno.vectordb.lancedb import LanceDb, SearchType
 from agno.embedder.openai import OpenAIEmbedder
+from agno.embedder.azure_openai import AzureOpenAIEmbedder
 import os
 
 # Set up the local directory path containing documents
-DOCUMENTS_DIR = "z:"  # Replace with your actual directory path
+DOCUMENTS_DIR = "X:\AI\Martin\Technical"  # Replace with your actual directory path
 
 def create_document_agent():
     # Verify the directory exists
@@ -20,13 +22,18 @@ def create_document_agent():
             uri="tmp/lancedb",
             table_name="documents",
             search_type=SearchType.hybrid,
-            embedder=OpenAIEmbedder(id="text-embedding-3-small")
+            embedder=AzureOpenAIEmbedder(
+                azure_endpoint="https://marti-m7i61trw-eastus2.cognitiveservices.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2023-05-15",
+                id="text-embedding-3-small",
+            )
         )
     )
 
     # Create the agent
     agent = Agent(
-        model=OpenAIChat(id="gpt-4o"),
+        model=AzureOpenAI(
+            azure_endpoint="https://mywebapp-openai.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-02-15-preview", 
+            id="gpt-4o-mini"), 
         description="An agent that reads and summarizes documents from a local directory",
         instructions=[
             "Read and understand all documents in the knowledge base",
